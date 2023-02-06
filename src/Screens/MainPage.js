@@ -1,21 +1,25 @@
-import React, {useState} from 'react';
-import {
-  Text,
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-} from 'react-native';
+import React, {useState, useCallback, useRef, useEffect} from 'react';
+import {Text, View, StyleSheet, useWindowDimensions} from 'react-native';
 import ProjectColors from '../Constants/ProjectColors';
 import RoundedButton from '../Components/RoundedButtonComp';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {FlatList} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {SetTimer, SetActivity} from '../Redux/action';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import BottomSheet from '../Components/BottomSheet';
+import {TouchableOpacity} from '@gorhom/bottom-sheet';
 
-export default MainPage = ({navigation}) => {
-  const {time, activity} = useSelector(state => state.activityReducer);
+export default MainPage = () => {
+  const {timer, activity} = useSelector(state => state.activityReducer);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      StopWatchF(newDate);
+    }, 1000);
+    setIntervalId(interval);
+  }, []);
 
   const IconButtonList = [
     {iconName: 'road', text: 'Driving'},
@@ -25,75 +29,174 @@ export default MainPage = ({navigation}) => {
     {iconName: 'ellipsis-h', text: 'Other'},
   ];
 
-  return (
-    <View style={styles.background}>
-      <View
-        style={{
-          flexDirection: 'row',
-          backgroundColor: ProjectColors.activityColor,
-          padding: 14,
-          justifyContent: 'space-between',
-          flex: 1,
-        }}>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          {activity == '' ? (
-            <Icon
-              style={{flex: 1}}
-              name="exclamation-triangle"
-              color={ProjectColors.white}
-              size={20}
-            />
-          ) : (
-            <Icon
-              style={{flex: 1}}
-              name="rest"
-              color={ProjectColors.white}
-              size={20}
-            />
-          )}
-        </View>
-        <View>
-          <Text
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: ProjectColors.white,
-              fontWeight: '700',
-              fontSize: 17,
-            }}>
-            00:00:24
-          </Text>
-        </View>
-      </View>
+  const [newDate, setDate] = useState(Date.now());
+  const [indx, setindx] = useState(0);
+  const [tmpindx, settmpindx] = useState(0);
+  const [timeText, setTimeText] = useState('');
+  const [item, setItem] = useState();
+  const [intervalId, setIntervalId] = useState(0);
 
-      <View style={{alignItems: 'center', flex: 22}}>
-        <FlatList
-          keyExtractor={(item, index) => item.toString()}
-          style={{
-            margin: 15,
-            width: '100%',
-          }}
-          data={IconButtonList}
-          numColumns={3}
-          renderItem={({item, index}) => (
-            <RoundedButton
-              iconName={item.iconName}
-              text={item.text}
-              onPressHandler={() => {
-                navigation.navigate('ConfirmPage');
-              }}
-            />
-          )}
-        />
+  const {height} = useWindowDimensions();
+
+  const bottomSheetRef = useRef();
+
+  const pressHandler = useCallback(() => {
+    bottomSheetRef.current.expand();
+  }, []);
+
+  const StopWatchF = newD => {
+    let currDate = Date.now();
+
+    var diff = (currDate - newD) / 1000;
+    diff = Math.abs(Math.floor(diff));
+
+    var days = Math.floor(diff / (24 * 60 * 60));
+    var leftSec = diff - days * 24 * 60 * 60;
+
+    var hrs = Math.floor(leftSec / (60 * 60));
+    var leftSec = leftSec - hrs * 60 * 60;
+
+    var min = Math.floor(leftSec / 60);
+    var leftSec = leftSec - min * 60;
+
+    return setTimeText(
+      ('00' + hrs).slice(-2) +
+        ':' +
+        ('00' + min).slice(-2) +
+        ':' +
+        ('00' + leftSec).slice(-2),
+    );
+  };
+
+  const modalButtonOnPress = () => {
+    dispatch(SetActivity(item.text));
+    dispatch(SetTimer(timeText));
+    setindx(tmpindx);
+    pressHandler();
+
+    clearInterval(intervalId);
+    setIntervalId(0);
+
+    newD = Date.now();
+    //setDate(newD);
+    const newInterval = setInterval(() => {
+      StopWatchF(newD);
+    }, 1000);
+    setIntervalId(newInterval);
+
+    bottomSheetRef.current.close();
+  };
+
+  const SelectIcon = props => {
+    return (
+      <Icon
+        style={{flex: 1}}
+        name={props.icName}
+        color={ProjectColors.white}
+        size={24}
+      />
+    );
+  };
+
+  return (
+    <GestureHandlerRootView style={{flex: 1}}>
+      <View style={styles.background}>
+        <View style={styles.activityContainerStyle}>
+          <View style={styles.ActivityLeftSideStyle}>
+            <View style={{marginRight: 8}}>
+              {activity === '' ? (
+                <SelectIcon icName="exclamation-triangle" />
+              ) : (
+                <SelectIcon icName={IconButtonList[indx].iconName} />
+              )}
+            </View>
+
+            {activity === '' ? (
+              <Text style={styles.activityTextStyle}>No Activity</Text>
+            ) : (
+              <Text style={styles.activityTextStyle}>
+                {IconButtonList[indx].text}
+              </Text>
+            )}
+          </View>
+
+          <Text style={styles.timeFont}>{timeText}</Text>
+        </View>
+
+        <View
+          style={{alignItems: 'center', width: '100%', alignSelf: 'center'}}>
+          <FlatList
+            keyExtractor={(item, index) => item.toString()}
+            style={{
+              margin: 15,
+              width: '100%',
+              alignContent: 'space-between',
+            }}
+            data={IconButtonList}
+            numColumns={3}
+            renderItem={({item, index}) => (
+              <RoundedButton
+                iconName={item.iconName}
+                text={item.text}
+                onPressHandler={() => {
+                  pressHandler();
+                  setItem(item);
+                  settmpindx(index);
+                }}
+              />
+            )}
+          />
+        </View>
+
+        <BottomSheet
+          ref={bottomSheetRef}
+          activeHeight={height * 0.7}
+          backgroundColor={ProjectColors.activityColor}
+          backDropColor={'black'}>
+          <View
+            style={{
+              flex: 1,
+              paddingVertical: 12,
+              //alignItems: 'center',
+            }}>
+            <Text style={styles.bottomsheetTextStyle}>
+              Your current activity is
+            </Text>
+            <Text style={styles.bottomSheetActivityStyle}>{activity}</Text>
+            <Text style={styles.bottomSheetActivityStyle}>{timeText}</Text>
+            <Text style={styles.bottomsheetTextStyle}>
+              You are about to change to:
+            </Text>
+            <View
+              style={{
+                height: '14%',
+                flexDirection: 'row',
+                justifyContent: 'center',
+              }}>
+              <Icon
+                style={{marginRight: 10}}
+                name={IconButtonList[tmpindx].iconName}
+                color={ProjectColors.white}
+                size={50}
+              />
+              <Text style={styles.iconTextStyle}>
+                {IconButtonList[tmpindx].text}
+              </Text>
+            </View>
+            <Text style={styles.bottomsheetTextStyle}>
+              Do you want to change your activity?
+            </Text>
+            <TouchableOpacity
+              style={styles.ModalButtonStyle}
+              onPress={() => {
+                modalButtonOnPress();
+              }}>
+              <Text style={styles.ModalButtonTextStyle}>Confirm</Text>
+            </TouchableOpacity>
+          </View>
+        </BottomSheet>
       </View>
-    </View>
+    </GestureHandlerRootView>
   );
 };
 
@@ -102,6 +205,63 @@ const styles = StyleSheet.create({
     backgroundColor: ProjectColors.backgroundColor,
     flex: 1,
     paddingVertical: 12,
-    paddingHorizontal: 16,
+  },
+  activityContainerStyle: {
+    flexDirection: 'row',
+    backgroundColor: ProjectColors.activityColor,
+    padding: 14,
+    marginHorizontal: 12,
+    height: '10%',
+    borderRadius: 6,
+  },
+  activityTextStyle: {
+    color: ProjectColors.white,
+    flex: 1,
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  ActivityLeftSideStyle: {
+    flexDirection: 'row',
+    flex: 1,
+    alignSelf: 'center',
+  },
+  timeFont: {
+    color: ProjectColors.white,
+    fontWeight: '700',
+    fontSize: 17,
+    alignSelf: 'center',
+  },
+  bottomsheetTextStyle: {
+    alignSelf: 'center',
+    height: '12%',
+    color: ProjectColors.white,
+    fontSize: 22,
+    fontWeight: '500',
+    marginVertical: 2,
+  },
+  bottomSheetActivityStyle: {
+    height: '12%',
+    alignSelf: 'center',
+    color: ProjectColors.white,
+    fontSize: 32,
+    fontWeight: '500',
+  },
+  iconTextStyle: {
+    color: ProjectColors.white,
+    fontSize: 38,
+    fontWeight: '700',
+  },
+  ModalButtonStyle: {
+    borderRadius: 12,
+    paddingVertical: 8,
+    alignSelf: 'center',
+    alignItems: 'center',
+    width: '90%',
+    backgroundColor: ProjectColors.white,
+  },
+  ModalButtonTextStyle: {
+    color: ProjectColors.headerColor,
+    fontSize: 30,
+    fontWeight: '600',
   },
 });

@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {SafeAreaView, Text, View, StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import ConfirmPage from './Screens/ConfirmPage';
 import MainPage from './Screens/MainPage';
 import {Provider} from 'react-redux';
 import reduxStore from './Redux/store';
@@ -23,27 +22,7 @@ function App() {
               <NavStack.Screen
                 name="MainPage"
                 component={MainPage}
-                options={{
-                  headerTitleAlign: 'center',
-                  title: 'Activities',
-                  headerStyle: {
-                    headerLayoutPreset: 'center',
-                    backgroundColor: ProjectColors.headerColor,
-                  },
-                  headerTitleStyle: {
-                    fontWeight: '600',
-                    fontSize: 28,
-                    color: ProjectColors.white,
-                  },
-                }}
-              />
-              <NavStack.Screen
-                name="ConfirmPage"
-                component={ConfirmPage}
-                options={{
-                  title: 'ConfirmPage',
-                  headerShown: false,
-                }}
+                options={options}
               />
             </NavStack.Navigator>
           </NavigationContainer>
@@ -53,6 +32,23 @@ function App() {
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  headerFontStyle: {
+    fontWeight: '600',
+    fontSize: 28,
+    color: ProjectColors.white,
+  },
+  headerStyle: {
+    headerLayoutPreset: 'center',
+    backgroundColor: ProjectColors.headerColor,
+  },
+});
+
+const options = {
+  headerTitleAlign: 'center',
+  title: 'Activities',
+  headerStyle: styles.headerStyle,
+  headerTitleStyle: styles.headerFontStyle,
+};
 
 export default App;

@@ -1,7 +1,7 @@
 import {SET_ACTIVITY, SET_TIMER} from './action';
 
 const initialState = {
-  timer: 0,
+  timer: '',
   activity: 'No Activity',
 };
 

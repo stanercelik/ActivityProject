@@ -5,25 +5,20 @@ import ProjectColors from '../Constants/ProjectColors';
 
 export default RoundedButton = props => {
   return (
-    <View
-      style={[{justifyContent: 'center', alignItems: 'center', flex: 1 / 3}]}>
+    <View style={[{flex: 1}]}>
       <TouchableOpacity
         style={{
           alignItems: 'center',
         }}
-        onPress={() => {
-          props.onPressHandler;
-        }}>
+        onPress={props.onPressHandler}>
         <View style={[styles.roundButtonStyle, styles.shadowProp]}>
           <Icon
             name={props.iconName}
             color={ProjectColors.activityColor}
-            size={54}
+            size={36}
           />
         </View>
-        <View>
-          <Text style={styles.TextStyle}>{props.text}</Text>
-        </View>
+        <Text style={styles.TextStyle}>{props.text}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -42,6 +37,7 @@ const styles = StyleSheet.create({
     color: ProjectColors.black,
     fontSize: 20,
     fontWeight: '600',
+    marginBottom: 8,
   },
   shadowProp: {
     shadowColor: '#000',
