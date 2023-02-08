@@ -15,6 +15,7 @@ export default MainPage = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    dispatch(SetActivity('No Activity'));
     const interval = setInterval(() => {
       StopWatchF(newDate);
     }, 1000);
@@ -28,6 +29,11 @@ export default MainPage = () => {
     {iconName: 'coffee', text: 'Rest'},
     {iconName: 'ellipsis-h', text: 'Other'},
   ];
+
+  const noActivity = {
+    iconName: 'exclamation-triangle',
+    text: 'No Activity',
+  };
 
   const [newDate, setDate] = useState(Date.now());
   const [indx, setindx] = useState(0);
@@ -104,15 +110,15 @@ export default MainPage = () => {
         <View style={styles.activityContainerStyle}>
           <View style={styles.ActivityLeftSideStyle}>
             <View style={{marginRight: 8}}>
-              {activity === '' ? (
-                <SelectIcon icName="exclamation-triangle" />
+              {activity == 'No Activity' ? (
+                <SelectIcon icName={noActivity.iconName} />
               ) : (
                 <SelectIcon icName={IconButtonList[indx].iconName} />
               )}
             </View>
 
-            {activity === '' ? (
-              <Text style={styles.activityTextStyle}>No Activity</Text>
+            {activity == 'No Activity' ? (
+              <Text style={styles.activityTextStyle}>{noActivity.text}</Text>
             ) : (
               <Text style={styles.activityTextStyle}>
                 {IconButtonList[indx].text}
@@ -139,9 +145,9 @@ export default MainPage = () => {
                 iconName={item.iconName}
                 text={item.text}
                 onPressHandler={() => {
-                  pressHandler();
                   setItem(item);
                   settmpindx(index);
+                  pressHandler();
                 }}
               />
             )}
@@ -150,7 +156,7 @@ export default MainPage = () => {
 
         <BottomSheet
           ref={bottomSheetRef}
-          activeHeight={height * 0.7}
+          activeHeight={height * 0.85}
           backgroundColor={ProjectColors.activityColor}
           backDropColor={'black'}>
           <View
@@ -233,14 +239,14 @@ const styles = StyleSheet.create({
   },
   bottomsheetTextStyle: {
     alignSelf: 'center',
-    height: '12%',
+    height: '11%',
     color: ProjectColors.white,
     fontSize: 22,
     fontWeight: '500',
     marginVertical: 2,
   },
   bottomSheetActivityStyle: {
-    height: '12%',
+    height: '11%',
     alignSelf: 'center',
     color: ProjectColors.white,
     fontSize: 32,
