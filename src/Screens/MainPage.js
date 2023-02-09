@@ -9,6 +9,7 @@ import {SetTimer, SetActivity} from '../Redux/action';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import BottomSheet from '../Components/BottomSheet';
 import {TouchableOpacity} from '@gorhom/bottom-sheet';
+import BackgroundGeolocation from 'react-native-background-geolocation';
 
 export default MainPage = () => {
   const {timer, activity} = useSelector(state => state.activityReducer);

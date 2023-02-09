@@ -1,14 +1,15 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
+def REACT_NATIVE_VERSION = new File(['node', '--print',"JSON.parse(require('fs').readFileSync(require.resolve('react-native/package.json'), 'utf-8')).version"].execute(null, rootDir).text.trim())
+
 buildscript {
     ext {
         buildToolsVersion = "33.0.0"
         minSdkVersion = 21
-        compileSdkVersion = 33
-        targetSdkVersion = 33
-        //appCompatVersion = "1.4.2"
-        //googlePlayServicesLocationVersion = "20.0.0"
-
+        compileSdkVersion = 31
+        targetSdkVersion = 31
+        appCompatVersion = "1.4.2"
+        googlePlayServicesLocationVersion = "21.0.1"
 
         // We use NDK 23 which has both M1 support and is the side-by-side NDK version from AGP.
         ndkVersion = "23.1.7779620"
@@ -23,24 +24,29 @@ buildscript {
     }
 }
 
-// allprojects {
-//     repositories {
-//         mavenLocal()
-//         maven {
-//             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-//             url("$rootDir/../node_modules/react-native/android")
-//         }
-//         maven {
-//             // Android JSC is installed from npm
-//             url("$rootDir/../node_modules/jsc-android/dist")
-//         }
-//         maven {
-//            // Required for react-native-background-geolocation
-//            url("${project(':react-native-background-geolocation').projectDir}/libs")
-//        }
-//         maven {
-//            // Required for react-native-background-fetch
-//            url("${project(':react-native-background-fetch').projectDir}/libs")
-//        }
-//     }
-// }
+allprojects {
+    configurations.all {
+        resolutionStrategy {
+            force "com.facebook.react:react-native:" + REACT_NATIVE_VERSION
+        }
+    }
+    repositories {
+        mavenLocal()
+        maven {
+            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+            url("$rootDir/../node_modules/react-native/android")
+        }
+        maven {
+            // Android JSC is installed from npm
+            url("$rootDir/../node_modules/jsc-android/dist")
+        }
+        maven {
+            // Required for react-native-background-geolocation
+            url("${project(':react-native-background-geolocation').projectDir}/libs")
+        }
+        maven {
+            // Required for react-native-background-fetch
+            url("${project(':react-native-background-fetch').projectDir}/libs")
+        }
+     }
+}
