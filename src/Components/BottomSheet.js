@@ -13,10 +13,7 @@ import Animated, {
   useAnimatedGestureHandler,
   interpolate,
 } from 'react-native-reanimated';
-import {
-  PanGestureHandler,
-  TouchableOpacity,
-} from 'react-native-gesture-handler';
+import {PanGestureHandler} from 'react-native-gesture-handler';
 
 const BottomSheet = forwardRef(
   ({activeHeight, children, backgroundColor, backDropColor}, ref) => {
@@ -24,21 +21,21 @@ const BottomSheet = forwardRef(
     const newActiveHeight = height - activeHeight;
     const topAnimation = useSharedValue(height);
 
-    const expand = useCallback(() => {
+    const expand = () => {
       'worklet';
       topAnimation.value = withSpring(newActiveHeight, {
         damping: 100,
         stiffness: 400,
       });
-    }, []);
+    };
 
-    const close = useCallback(() => {
+    const close = () => {
       'worklet';
       topAnimation.value = withSpring(height, {
         damping: 100,
         stiffness: 400,
       });
-    }, []);
+    };
 
     useImperativeHandle(
       ref,

@@ -1,10 +1,10 @@
-export const SET_TIMER = 'SET_TIMER';
+export const SET_ACTIVITY_DATE = 'SET_ACTIVITY_DATE';
 export const SET_ACTIVITY = 'SET_ACTIVITY';
 
-export const SetTimer = timer => {
+export const SetActivityDate = activityDate => {
   return {
-    type: SET_TIMER,
-    payload: timer,
+    type: SET_ACTIVITY_DATE,
+    payload: activityDate,
   };
 };
 
